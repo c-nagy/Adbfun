@@ -32,7 +32,7 @@ with open('cred') as openfileobject:
 			hint = pipe_removal[4]
 			if len(hint) > 0: #If hint is empty, ignore line
 				pass_and_hint.append([passwd, hint, email])
-print "Pickling..."
+print "Creating DB"
 adobefundb['stage1'] = pass_and_hint
 adobefundb.close()
 
