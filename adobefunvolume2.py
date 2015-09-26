@@ -1,7 +1,7 @@
 import time
 import collections
 import sys
-import shelve
+import dataset
 
 # Console colors
 W = '\033[0m'  # white (normal)
@@ -16,8 +16,8 @@ BO = '\033[1m'   # bold
 NO = '\033[0m'   # normal
 
 answers = open('answers.txt', 'w')
-adobefundb = shelve.open('adobefun.db')
-adobefundb['stage1'] = []
+db = dataset.connect('sqlite:///adb.db')
+table = db['adb']
 
 #Stage 1: Creating and pickling [password, hint] reference list:
 print "Stage 1: Creating and pickling [password, hint] reference list..."
@@ -31,13 +31,13 @@ with open('cred') as openfileobject:
 			passwd = pipe_removal[3][:-3] #[:-3] removes last three "==-" chars from passwd str
 			hint = pipe_removal[4]
 			if len(hint) > 0: #If hint is empty, ignore line
-				pass_and_hint.append([passwd, hint, email])
-print "Creating DB"
-adobefundb['stage1'] = pass_and_hint
-adobefundb.close()
-
+				#pass_and_hint.append([passwd, hint, email])
+				table.insert(dict(passwd=passwd, hint=hint, email=email))
 stage1end = time.time()
 print "~" + str(int((stage1end - stage1start)/60)) + " minutes"
+
+
+"""
 #Stage 2: Create list of only passwords:
 print "Stage 2: Creating list of only passwords..."
 stage2start = time.time()
@@ -122,3 +122,4 @@ def display_puzzle(hints):
 display_puzzle(25)
 answers.close()
 print answer_list
+"""
