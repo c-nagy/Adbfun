@@ -6,7 +6,6 @@ c = conn.cursor()
 c.execute('''CREATE TABLE adb
 		(passwd TEXT, hint TEXT, email TEXT)''')
 
-#Stage 1: Creating and pickling [password, hint] reference list:
 print " [+] Reading list of encrypted passwords file..."
 cred = open('cred')
 print " [+] Building database. Go take a walk, this will take a long time."
