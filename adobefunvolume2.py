@@ -1,7 +1,8 @@
-import time
+import time #Keep track of bottlenecks in code stages
 import collections
 import sys
-import dataset
+import os #To check if database is prebuilt
+import sqlite3 #Create and query database
 
 # Console colors
 W = '\033[0m'  # white (normal)
@@ -15,24 +16,40 @@ GR = '\033[37m'  # gray
 BO = '\033[1m'   # bold
 NO = '\033[0m'   # normal
 
-answers = open('answers.txt', 'w')
-db = dataset.connect('sqlite:///adb.db')
-table = db['adb']
+#Initialization stuffs
+conn = sqlite3.connect('adb.db') #DB initialize
+c = conn.cursor() #SQLite req
+answers = open('answers.txt', 'w') #Answers save loc.
 
-#Stage 1: Creating and pickling [password, hint] reference list:
-print "Stage 1: Creating and pickling [password, hint] reference list..."
+#Database generation
+print " [*] checking if database exists already"
 stage1start = time.time()
-with open('cred') as openfileobject:
-	pass_and_hint = []
-	for line in openfileobject:
-       		pipe_removal = line.split('|-')
-		if len(pipe_removal) == 6:
-			email = pipe_removal[2][:-1] #[:-1] removes last '-' char from email str
-			passwd = pipe_removal[3][:-3] #[:-3] removes last three "==-" chars from passwd str
-			hint = pipe_removal[4]
-			if len(hint) > 0: #If hint is empty, ignore line
-				#pass_and_hint.append([passwd, hint, email])
-				table.insert(dict(passwd=passwd, hint=hint, email=email))
+if os.path.isfile('adb.db'):
+    print " [*] yes, database is here!"
+else:
+    print " [*] nope, we will have to generate one now"
+    print " [*] generating database, please be patient"
+    #Create sqlite table
+    c.execute('''CREATE TABLE adb
+		(passwd TEXT, hint TEXT, email TEXT)''')
+    print " [*] reading list of encrypted passwords file"
+    cred = open('cred')
+    #Formatting data for table
+    for line in cred:
+	pipe_removal = line.split('|-')
+	if len(pipe_removal) == 6: 
+		passwd = pipe_removal[3][:-3]
+		hint = pipe_removal[4]
+		email = pipe_removal[2][:-1]
+		if len(hint) > 0:
+                        #Inserting data into table
+			c.execute("INSERT INTO adb (passwd, hint, email) VALUES (?, ?, ?)",
+				(passwd, hint, email))
+    print " [*] finished generating database, that only had to be done once"
+#Close out database for now
+    conn.commit()
+    conn.close()
+#Calculate stage time estimation
 stage1end = time.time()
 print "~" + str(int((stage1end - stage1start)/60)) + " minutes"
 
