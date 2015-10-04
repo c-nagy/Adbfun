@@ -17,23 +17,25 @@ BO = '\033[1m'   # bold
 NO = '\033[0m'   # normal
 
 #Initialization stuffs
-conn = sqlite3.connect('adb.db') #DB initialize
-c = conn.cursor() #SQLite req
 answers = open('answers.txt', 'w') #Answers save loc.
 
 #Database generation
 print " [*] checking if database exists already"
 stage1start = time.time()
-if os.path.isfile('adb.db'):
+if os.path.isfile('adb1000.db'):
+    conn = sqlite3.connect('adb1000.db') #DB initialize
+    c = conn.cursor() #SQLite req
     print " [*] yes, database is here!"
 else:
     print " [*] nope, we will have to generate one now"
+    conn = sqlite3.connect('adb1000.db') #DB initialize
+    c = conn.cursor() #SQLite req
     print " [*] generating database, please be patient"
     #Create sqlite table
     c.execute('''CREATE TABLE adb
 		(passwd TEXT, hint TEXT, email TEXT)''')
     print " [*] reading list of encrypted passwords file"
-    cred = open('cred')
+    cred = open('cred1000')
     #Formatting data for table
     for line in cred:
 	pipe_removal = line.split('|-')
